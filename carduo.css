@@ -1,0 +1,17 @@
+.card {
+	float: left;
+	display: inline-block;
+	width: 22%;
+	height: 125px;
+	background: blue;
+	border: 2px solid black;
+	margin: 1.5%;
+}
+
+.half {
+	width: 585px;
+}
+
+.container {
+	width: 1170px;
+}
