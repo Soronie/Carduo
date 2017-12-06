@@ -59,8 +59,12 @@ $(".fa:not(.lives)").on("click", function(){
 
 			livesDisplay.textContent = Number(livesDisplay.textContent)-1;
 
-			second.animate({ opacity: 0}, 400);
-			first.animate({ opacity: 0}, 400);
+			// If the player still has at least one life, make the two fade
+			if(Number(livesDisplay.textContent) > 0)
+			{
+				second.animate({ opacity: 0}, 400);
+				first.animate({ opacity: 0}, 400);
+			}
 		}
 
 		// Discard current cards for the next round
@@ -76,7 +80,9 @@ $(".fa:not(.lives)").on("click", function(){
 	}
 	else if(Number(livesDisplay.textContent) === 0)
 	{
+		// Reveal every card when the game is over
 		gameRunning = false;
+		$(".fa:not(.lives)").animate({ opacity: 1}, 300);
 		$(".btn").text("Play Again?");
 		$(".btn").css("visibility", "visible");
 	}
@@ -114,6 +120,8 @@ function revealCards() {
 	cardColors = {};
 
 	livesDisplay.textContent = initialLives;
+	$(newCards).removeClass("selected");
+
 	if(randomPositions)
 	{
 		for(var i = 0; i < symbols.length; i++)
@@ -126,8 +134,6 @@ function revealCards() {
 	{
 		symbols[randomPositions[i]].classList.add("fa-" + types[i % types.length]);
 	}
-
-	$(newCards).removeClass("selected");
 
 	// Assign colors based on icon
 	symbols.forEach(function(card){
