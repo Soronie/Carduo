@@ -1,17 +1,34 @@
 .card {
-	float: left;
 	display: inline-block;
 	width: 22%;
 	height: 125px;
-	background: blue;
+	background: black;
 	border: 2px solid black;
 	margin: 1.5%;
+	text-align: center;
+	padding: 0;
 }
 
 .half {
 	width: 585px;
+	text-align: center;
+	margin: auto;
 }
 
 .container {
 	width: 1170px;
+}
+
+.fa {
+	color: white;
+	font-size: 75px;
+	padding-top: 20px;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+h1 {
+	text-align: center;
+	margin: 20px;
 }
