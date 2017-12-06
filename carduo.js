@@ -1,9 +1,14 @@
 // Select all the cards
-var cards = document.querySelectorAll(".fa");
+var cards = document.querySelectorAll(".fa:not(.lives)");
 // Keep track of colors for each set of icons
 var cardColors = {};
 var first = null;
 var second = null;
+var gameRunning = true;
+
+var scoreDisplay = document.querySelector("#score");
+var livesDisplay = document.querySelector("#lives");
+var initialLives = Number(livesDisplay.textContent);
 
 // Assign colors based on icon
 cards.forEach(function(card){
@@ -17,10 +22,10 @@ cards.forEach(function(card){
 
 // When a card is clicked, mark it as selected
 // and/or check if the first and second selected cards match
-$(".fa").on("click", function(){
+$(".fa:not(.lives)").on("click", function(){
 	var icon = $(this);
 	var unMatched = icon.attr("class").indexOf("selected") === -1;
-	if(!unMatched) return;
+	if(!unMatched || !gameRunning) return;
 
 	if(first === null)
 	{
@@ -42,19 +47,27 @@ $(".fa").on("click", function(){
 			$(second).parent().fadeTo(250, 0);
 		}
 		else
-		{	// If the icons don't match, they are no longer selected
+		{	// If the icons don't match, deduct lives
+			// The cards are no longer selected for the next attempt
 			first.removeClass("selected");
 			second.removeClass("selected");
+
+			livesDisplay.textContent = Number(livesDisplay.textContent)-1;
 		}
 
 		// Discard current cards for the next round
 		first = second = null;
 	}
 
-	// Check to see if all the cards are cleared. If so, increment the score
-	// and start a new round
+	// Increment the score if th round is completed
+	// End the game once there are no remaining lives
 	if($(".selected").length === $(".card").length)
-		console.log("The current round is over. Increment score.");
+	{
+		scoreDisplay.textContent = Number(scoreDisplay.textContent)+1;
+		livesDisplay.textContent = initialLives;
+	}
+	else if(Number(livesDisplay.textContent) === 0)
+		gameRunning = false;
 
 });
 
