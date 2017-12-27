@@ -6,6 +6,16 @@ body {
 	font-family: 'Ranchers', cursive;
 }
 
+h1 {
+	text-align: center;
+	font-size: 100px;
+	letter-spacing: 4px;
+}
+
+h2 {
+	font-size: 75px;
+}
+
 .card {
 	display: inline-block;
 	width: 22%;
@@ -36,16 +46,6 @@ body {
 	height: 100%;
 	box-sizing: border-box;
 	border-radius: inherit;
-}
-
-h1 {
-	text-align: center;
-	font-size: 100px;
-	letter-spacing: 4px;
-}
-
-h2 {
-	font-size: 75px;
 }
 
 #right div:nth-of-type(2) {

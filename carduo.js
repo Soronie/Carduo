@@ -1,4 +1,3 @@
-var cards = document.querySelectorAll(".card");
 // Select all the symbols of cards
 var symbols = document.querySelectorAll(".fa:not(.lives)");
 var types = [
@@ -11,8 +10,7 @@ var types = [
 	"smile-o",
 	"heart"
 ];
-// Keep track of colors for each set of icons
-var cardColors = {};
+
 var first = null;
 var second = null;
 var gameRunning = false;
@@ -20,25 +18,27 @@ var numberOfCards = 16;
 
 var scoreDisplay = document.querySelector("#score");
 var livesDisplay = document.querySelector("#lives");
-var initialLives = Number(livesDisplay.textContent);
+
 var randomPositions;
+
+// Send initial lives as embedded js value later
+var initialLives = Number(livesDisplay.textContent);
 
 // When a card is clicked, mark it as selected
 // and/or check if the first and second selected cards match
 $(".fa:not(.lives)").on("click", function(){
-	var icon = $(this);
-	var unMatched = icon.attr("class").indexOf("selected") === -1;
+	var unMatched = $(this).attr("class").indexOf("selected") === -1;
 	if(!unMatched || !gameRunning) return;
 
 	if(first === null)
 	{
-		first = icon;
+		first = $(this);
 		first.addClass("selected");
 		first.animate({ opacity: 1}, 200);
 	}
 	else
 	{
-		second = icon;
+		second = $(this);
 		second.addClass("selected");
 		second.animate({ opacity: 1}, 200);
 
@@ -89,6 +89,7 @@ $(".fa:not(.lives)").on("click", function(){
 
 });
 
+// On the start/play again button, hide the button, reset the score, and reveal the cards
 $(".btn").on("click", function(){
 	$(this).css("visibility", "hidden");
 	scoreDisplay.textContent = 0;

@@ -1,0 +1,24 @@
+{
+  "name": "carduo",
+  "version": "1.0.0",
+  "description": "Card matching game that tests short-term memory.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Soronie/Carduo.git"
+  },
+  "author": "Rafaeli Arroyo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Soronie/Carduo/issues"
+  },
+  "homepage": "https://github.com/Soronie/Carduo#readme",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.2"
+  }
+}
