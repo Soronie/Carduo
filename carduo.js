@@ -30,14 +30,11 @@ $(".fa:not(.lives)").on("click", function(){
 	var unMatched = $(this).attr("class").indexOf("selected") === -1;
 	if(!unMatched || !gameRunning) return;
 
-	if(first === null)
-	{
+	if(first === null){
 		first = $(this);
 		first.addClass("selected");
 		first.animate({ opacity: 1}, 200);
-	}
-	else
-	{
+	}else{
 		second = $(this);
 		second.addClass("selected");
 		second.animate({ opacity: 1}, 200);
@@ -45,14 +42,11 @@ $(".fa:not(.lives)").on("click", function(){
 		var firstIcon = first.attr("class").split(' ')[1];
 		var secondIcon = second.attr("class").split(' ')[1];
 
-		if(firstIcon === secondIcon)
-		{	// If the icons match, make them invisible
+		if(firstIcon === secondIcon){	// If the icons match, make them invisible
 			// Make them fade then set opacity to 0
 			$(first).parent().fadeTo(750, 0);
 			$(second).parent().fadeTo(750, 0);
-		}
-		else
-		{	// If the icons don't match, deduct lives
+		}else{	// If the icons don't match, deduct lives
 			// The cards are no longer selected for the next attempt
 			first.removeClass("selected");
 			second.removeClass("selected");
@@ -60,8 +54,7 @@ $(".fa:not(.lives)").on("click", function(){
 			livesDisplay.textContent = Number(livesDisplay.textContent)-1;
 
 			// If the player still has at least one life, make the two fade
-			if(Number(livesDisplay.textContent) > 0)
-			{
+			if(Number(livesDisplay.textContent) > 0){
 				second.animate({ opacity: 0}, 400);
 				first.animate({ opacity: 0}, 400);
 			}
@@ -73,13 +66,10 @@ $(".fa:not(.lives)").on("click", function(){
 
 	// Increment the score if the round is completed
 	// End the game once there are no remaining lives
-	if($(".selected").length === $(".card").length)
-	{
+	if($(".selected").length === $(".card").length){
 		scoreDisplay.textContent = Number(scoreDisplay.textContent)+1;
 		setTimeout(revealCards, 1250);
-	}
-	else if(Number(livesDisplay.textContent) === 0)
-	{
+	}else if(Number(livesDisplay.textContent) === 0){
 		// Reveal every card when the game is over
 		gameRunning = false;
 		$(".fa:not(.lives)").animate({ opacity: 1}, 300);
@@ -92,6 +82,7 @@ $(".fa:not(.lives)").on("click", function(){
 // On the start/play again button, hide the button, reset the score, and reveal the cards
 $(".btn").on("click", function(){
 	$(this).css("visibility", "hidden");
+	$("#instruction").css("visibility", "hidden");
 	scoreDisplay.textContent = 0;
 	revealCards();
 });
@@ -99,8 +90,9 @@ $(".btn").on("click", function(){
 // Return a random color of somewhat strong intensity
 function randomColor() {
 	var intensities = [];
-	for(var i = 0; i < 3; i++)
+	for(var i = 0; i < 3; i++){
 		intensities.push(Math.floor(Math.random()*256 - 64));
+	}
 	return "rgb(" + intensities[0] + ", " + intensities[1] + ", " + intensities[2] + ")";
 }
 
@@ -123,16 +115,14 @@ function revealCards() {
 	livesDisplay.textContent = initialLives;
 	$(newCards).removeClass("selected");
 
-	if(randomPositions)
-	{
+	if(randomPositions){
 		for(var i = 0; i < symbols.length; i++)
 			symbols[randomPositions[i]].classList.remove("fa-" + types[i % types.length]);
 	}
 
 	randomPositions = generateRandomPositions(numberOfCards);
 
-	for(var i = 0; i < symbols.length; i++)
-	{
+	for(var i = 0; i < symbols.length; i++){
 		symbols[randomPositions[i]].classList.add("fa-" + types[i % types.length]);
 	}
 

@@ -62,3 +62,7 @@ h2 {
 .btn:focus {
 	outline: 0;
 }
+
+#instruction {
+	font-size: 35px;
+}
