@@ -1,14 +1,16 @@
 var express = require("express");
 var app = express();
 var port = process.env.PORT || 8000;
+var path = require("path");
 
 // Allow access to static content for the app from the current directory 
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 app.set("view engine", "ejs");
 
 // Send the main application embedded JS page with initial number of lives/round
 app.get('*', function(req, res){
-	res.render("index", {initialLives: 5});
+	//res.render("index", {initialLives: 5});
+	res.sendFile(path.join(__dirname+ '/public/index.html'));
 });
 
 // Start server
