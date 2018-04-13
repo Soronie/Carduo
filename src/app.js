@@ -1,16 +1,36 @@
 class CarduoApp extends React.Component{
 	constructor(props){
 		super(props);
+		this.handleCount = this.handleCount.bind(this);
+		this.state = {
+			count: 0,
+			gameRunning: false
+		}
+	}
+
+	handleCount(inc){
+		this.setState((prevState) => {
+			return {
+				count: prevState.count+inc
+			};
+		});
+
+		this.setState((prevState) => {
+			return {
+				gameRunning: prevState.count < 16 ? true : false
+			};
+		});
 	}
 
 	render(){
 		this.title = 'Carduo';
+
 		return(
 			<div>
 				<h1>{this.title}</h1>
 				<div className="container">
 					<div className="row">
-						<Cards />
+						<Cards handleCount={this.handleCount}/>
 						<Guide />
 					</div>
 				</div>
@@ -22,12 +42,40 @@ class CarduoApp extends React.Component{
 class Cards extends React.Component{
 	constructor(props){
 		super(props);
+		this.handleSelected = this.handleSelected.bind(this);
+		this.state = {
+			first: undefined,
+			second: undefined
+		}
+	}
+
+	handleSelected(card){
+		if(!this.state.first && !this.state.second){
+			this.setState(() => {
+				return {
+					first: card
+				};
+			});
+		}else if(!this.state.second){
+			this.setState(() => {
+				return {
+					second: card
+				};
+			});
+		}else if(this.state.first === this.state.second){
+			console.log("Found a match!");
+		}else{
+			this.setState(() => {
+				first: undefined
+				second: undefined
+			});
+		}
 	}
 
 	render(){
 		let cards = [];
 		for(let i = 0; i < 16; i++){
-			cards.push(<Card key={i}/>);
+			cards.push(<Card handleSelected={this.handleSelected} key={i}/>);
 		}
 
 		return(
@@ -43,11 +91,26 @@ class Cards extends React.Component{
 class Card extends React.Component{
 	constructor(props){
 		super(props);
+		this.handleSelected = this.handleSelected.bind(this);
+		this.state = {
+			selected: false
+		}
+	}
+
+	handleSelected(e){
+		if(!this.state.selected){
+			this.setState(() => {
+				return {
+					selected: true
+				};
+			});
+			this.props.handleSelected(e.target.className);
+		}
 	}
 
 	render(){
 		return(
-			<div className="col-xs-3 card">
+			<div onClick={this.handleSelected} className="col-xs-3 card">
 				<i className="fa" aria-hidden="true"></i>
 			</div>
 		);

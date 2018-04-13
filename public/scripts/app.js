@@ -14,13 +14,36 @@ var CarduoApp = function (_React$Component) {
 	function CarduoApp(props) {
 		_classCallCheck(this, CarduoApp);
 
-		return _possibleConstructorReturn(this, (CarduoApp.__proto__ || Object.getPrototypeOf(CarduoApp)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (CarduoApp.__proto__ || Object.getPrototypeOf(CarduoApp)).call(this, props));
+
+		_this.handleCount = _this.handleCount.bind(_this);
+		_this.state = {
+			count: 0,
+			gameRunning: false
+		};
+		return _this;
 	}
 
 	_createClass(CarduoApp, [{
+		key: "handleCount",
+		value: function handleCount(inc) {
+			this.setState(function (prevState) {
+				return {
+					count: prevState.count + inc
+				};
+			});
+
+			this.setState(function (prevState) {
+				return {
+					gameRunning: prevState.count < 16 ? true : false
+				};
+			});
+		}
+	}, {
 		key: "render",
 		value: function render() {
 			this.title = 'Carduo';
+
 			return React.createElement(
 				"div",
 				null,
@@ -35,7 +58,7 @@ var CarduoApp = function (_React$Component) {
 					React.createElement(
 						"div",
 						{ className: "row" },
-						React.createElement(Cards, null),
+						React.createElement(Cards, { handleCount: this.handleCount }),
 						React.createElement(Guide, null)
 					)
 				)
@@ -52,15 +75,46 @@ var Cards = function (_React$Component2) {
 	function Cards(props) {
 		_classCallCheck(this, Cards);
 
-		return _possibleConstructorReturn(this, (Cards.__proto__ || Object.getPrototypeOf(Cards)).call(this, props));
+		var _this2 = _possibleConstructorReturn(this, (Cards.__proto__ || Object.getPrototypeOf(Cards)).call(this, props));
+
+		_this2.handleSelected = _this2.handleSelected.bind(_this2);
+		_this2.state = {
+			first: undefined,
+			second: undefined
+		};
+		return _this2;
 	}
 
 	_createClass(Cards, [{
+		key: "handleSelected",
+		value: function handleSelected(card) {
+			if (!this.state.first && !this.state.second) {
+				this.setState(function () {
+					return {
+						first: card
+					};
+				});
+			} else if (!this.state.second) {
+				this.setState(function () {
+					return {
+						second: card
+					};
+				});
+			} else if (this.state.first === this.state.second) {
+				console.log("Found a match!");
+			} else {
+				this.setState(function () {
+					first: undefined;
+					second: undefined;
+				});
+			}
+		}
+	}, {
 		key: "render",
 		value: function render() {
 			var cards = [];
 			for (var i = 0; i < 16; i++) {
-				cards.push(React.createElement(Card, { key: i }));
+				cards.push(React.createElement(Card, { handleSelected: this.handleSelected, key: i }));
 			}
 
 			return React.createElement(
@@ -84,15 +138,33 @@ var Card = function (_React$Component3) {
 	function Card(props) {
 		_classCallCheck(this, Card);
 
-		return _possibleConstructorReturn(this, (Card.__proto__ || Object.getPrototypeOf(Card)).call(this, props));
+		var _this3 = _possibleConstructorReturn(this, (Card.__proto__ || Object.getPrototypeOf(Card)).call(this, props));
+
+		_this3.handleSelected = _this3.handleSelected.bind(_this3);
+		_this3.state = {
+			selected: false
+		};
+		return _this3;
 	}
 
 	_createClass(Card, [{
+		key: "handleSelected",
+		value: function handleSelected(e) {
+			if (!this.state.selected) {
+				this.setState(function () {
+					return {
+						selected: true
+					};
+				});
+				this.props.handleSelected(e.target.className);
+			}
+		}
+	}, {
 		key: "render",
 		value: function render() {
 			return React.createElement(
 				"div",
-				{ className: "col-xs-3 card" },
+				{ onClick: this.handleSelected, className: "col-xs-3 card" },
 				React.createElement("i", { className: "fa", "aria-hidden": "true" })
 			);
 		}
