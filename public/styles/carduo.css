@@ -46,6 +46,7 @@ h2 {
 	height: 100%;
 	box-sizing: border-box;
 	border-radius: inherit;
+	opacity: 0;
 }
 
 #right div:nth-of-type(2) {
