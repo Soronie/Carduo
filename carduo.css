@@ -20,7 +20,7 @@ h2 {
 	display: inline-block;
 	width: 22%;
 	height: 125px;
-	background: black;
+	background: white;
 	border: 2px solid black;
 	margin: 1.5%;
 	text-align: center;
@@ -65,4 +65,13 @@ h2 {
 
 #instruction {
 	font-size: 35px;
+}
+
+.myElement {
+  opacity: 0;
+  transition: 2s opacity;
+}
+
+.fade-in {
+  opacity: 1;
 }
