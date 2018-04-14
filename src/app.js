@@ -43,39 +43,78 @@ class Cards extends React.Component{
 	constructor(props){
 		super(props);
 		this.handleSelected = this.handleSelected.bind(this);
+		this.types = [
+			"fire",
+			"gamepad",
+			"shield",
+			"chain-broken",
+			"leaf",
+			"music",
+			"smile-o",
+			"heart"
+		];
+
+		let pos = this.generateRandomPositions();
+		let selected = Array(16).fill(false);
+
 		this.state = {
-			first: undefined,
-			second: undefined
+			positions: pos,
+			selected: selected,
+			first: undefined
 		}
 	}
 
+	generateRandomPositions(){
+		let arr = [];
+
+		while(arr.length < 16){
+			var randomNumber = Math.floor(Math.random()*16);
+			if(arr.indexOf(randomNumber) === -1)
+				arr[arr.length] = randomNumber;
+		}
+
+		return arr;
+	}
+
 	handleSelected(card){
-		if(!this.state.first && !this.state.second){
-			this.setState(() => {
+		console.log(card.id + " " + card.className);
+		if(!this.state.first){
+			this.setState((prevState) => {
+				let selected = prevState.selected.slice();
+				selected[card.id] = true;
 				return {
-					first: card
+					first: card,
+					selected: selected
 				};
 			});
-		}else if(!this.state.second){
-			this.setState(() => {
-				return {
-					second: card
-				};
-			});
-		}else if(this.state.first === this.state.second){
-			console.log("Found a match!");
 		}else{
-			this.setState(() => {
-				first: undefined
-				second: undefined
+			this.setState((prevState) => {
+				let selected = prevState.selected.slice();
+
+				if(this.state.first.className === card.className){
+					selected[card.id] = true;
+				}else{
+					selected[this.state.first.id] = false;
+				}
+
+				return {
+					selected: selected,
+					first: undefined
+				};
 			});
 		}
+
+		return false;
 	}
 
 	render(){
 		let cards = [];
 		for(let i = 0; i < 16; i++){
-			cards.push(<Card handleSelected={this.handleSelected} key={i}/>);
+			cards.push(<Card type={this.types[this.state.positions[i] % 8]} index={i}
+				handleSelected={this.handleSelected}
+				selected={this.state.selected[i]}
+				key={i}
+			/>);
 		}
 
 		return(
@@ -92,26 +131,18 @@ class Card extends React.Component{
 	constructor(props){
 		super(props);
 		this.handleSelected = this.handleSelected.bind(this);
-		this.state = {
-			selected: false
-		}
 	}
 
 	handleSelected(e){
-		if(!this.state.selected){
-			this.setState(() => {
-				return {
-					selected: true
-				};
-			});
-			this.props.handleSelected(e.target.className);
+		if(!this.props.selected){
+			this.props.handleSelected(e.target);
 		}
 	}
 
 	render(){
 		return(
 			<div onClick={this.handleSelected} className="col-xs-3 card">
-				<i className="fa" aria-hidden="true"></i>
+				<i id={this.props.index} className={"fa " + this.props.type} aria-hidden="true"></i>
 			</div>
 		);
 	}

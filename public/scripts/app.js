@@ -78,43 +78,75 @@ var Cards = function (_React$Component2) {
 		var _this2 = _possibleConstructorReturn(this, (Cards.__proto__ || Object.getPrototypeOf(Cards)).call(this, props));
 
 		_this2.handleSelected = _this2.handleSelected.bind(_this2);
+		_this2.types = ["fire", "gamepad", "shield", "chain-broken", "leaf", "music", "smile-o", "heart"];
+
+		var pos = _this2.generateRandomPositions();
+		var selected = Array(16).fill(false);
+
 		_this2.state = {
-			first: undefined,
-			second: undefined
+			positions: pos,
+			selected: selected,
+			first: undefined
 		};
 		return _this2;
 	}
 
 	_createClass(Cards, [{
+		key: "generateRandomPositions",
+		value: function generateRandomPositions() {
+			var arr = [];
+
+			while (arr.length < 16) {
+				var randomNumber = Math.floor(Math.random() * 16);
+				if (arr.indexOf(randomNumber) === -1) arr[arr.length] = randomNumber;
+			}
+
+			return arr;
+		}
+	}, {
 		key: "handleSelected",
 		value: function handleSelected(card) {
-			if (!this.state.first && !this.state.second) {
-				this.setState(function () {
+			var _this3 = this;
+
+			console.log(card.id + " " + card.className);
+			if (!this.state.first) {
+				this.setState(function (prevState) {
+					var selected = prevState.selected.slice();
+					selected[card.id] = true;
 					return {
-						first: card
+						first: card,
+						selected: selected
 					};
 				});
-			} else if (!this.state.second) {
-				this.setState(function () {
-					return {
-						second: card
-					};
-				});
-			} else if (this.state.first === this.state.second) {
-				console.log("Found a match!");
 			} else {
-				this.setState(function () {
-					first: undefined;
-					second: undefined;
+				this.setState(function (prevState) {
+					var selected = prevState.selected.slice();
+
+					if (_this3.state.first.className === card.className) {
+						selected[card.id] = true;
+					} else {
+						selected[_this3.state.first.id] = false;
+					}
+
+					return {
+						selected: selected,
+						first: undefined
+					};
 				});
 			}
+
+			return false;
 		}
 	}, {
 		key: "render",
 		value: function render() {
 			var cards = [];
 			for (var i = 0; i < 16; i++) {
-				cards.push(React.createElement(Card, { handleSelected: this.handleSelected, key: i }));
+				cards.push(React.createElement(Card, { type: this.types[this.state.positions[i] % 8], index: i,
+					handleSelected: this.handleSelected,
+					selected: this.state.selected[i],
+					key: i
+				}));
 			}
 
 			return React.createElement(
@@ -138,25 +170,17 @@ var Card = function (_React$Component3) {
 	function Card(props) {
 		_classCallCheck(this, Card);
 
-		var _this3 = _possibleConstructorReturn(this, (Card.__proto__ || Object.getPrototypeOf(Card)).call(this, props));
+		var _this4 = _possibleConstructorReturn(this, (Card.__proto__ || Object.getPrototypeOf(Card)).call(this, props));
 
-		_this3.handleSelected = _this3.handleSelected.bind(_this3);
-		_this3.state = {
-			selected: false
-		};
-		return _this3;
+		_this4.handleSelected = _this4.handleSelected.bind(_this4);
+		return _this4;
 	}
 
 	_createClass(Card, [{
 		key: "handleSelected",
 		value: function handleSelected(e) {
-			if (!this.state.selected) {
-				this.setState(function () {
-					return {
-						selected: true
-					};
-				});
-				this.props.handleSelected(e.target.className);
+			if (!this.props.selected) {
+				this.props.handleSelected(e.target);
 			}
 		}
 	}, {
@@ -165,7 +189,7 @@ var Card = function (_React$Component3) {
 			return React.createElement(
 				"div",
 				{ onClick: this.handleSelected, className: "col-xs-3 card" },
-				React.createElement("i", { className: "fa", "aria-hidden": "true" })
+				React.createElement("i", { id: this.props.index, className: "fa " + this.props.type, "aria-hidden": "true" })
 			);
 		}
 	}]);
@@ -179,12 +203,12 @@ var Guide = function (_React$Component4) {
 	function Guide(props) {
 		_classCallCheck(this, Guide);
 
-		var _this4 = _possibleConstructorReturn(this, (Guide.__proto__ || Object.getPrototypeOf(Guide)).call(this, props));
+		var _this5 = _possibleConstructorReturn(this, (Guide.__proto__ || Object.getPrototypeOf(Guide)).call(this, props));
 
-		_this4.state = {
+		_this5.state = {
 			lives: 5
 		};
-		return _this4;
+		return _this5;
 	}
 
 	_createClass(Guide, [{
