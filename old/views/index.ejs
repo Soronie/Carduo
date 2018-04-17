@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Carduo</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Ranchers" rel="stylesheet">
+	<link rel="stylesheet" href="../carduo.css">
+</head>
+<body>
+	<h1>Carduo</h1>
+	<div class="container">
+		<div class="row">
+			<!-- Left half - cards -->
+			<div id="Left" class="col-xs-6 half">
+				<div class="row">
+					<% for(var i = 0; i < 16; i++){ %>
+						<div class="col-xs-3 card">
+							<i class="fa" aria-hidden="true"></i>
+						</div>
+					<% } %>
+				</div>
+			</div>
+
+			<!-- Right half - score, lives, play again button -->
+			<div id="right" class="col-xs-6 half">
+				<!-- Score -->
+				<div>
+					<h2>Score</h2>
+					<h2 id="score">0</h2>
+				</div>
+				<!-- Lives -->
+				<div>
+					<i class="fa fa-heart-o lives" aria-hidden="true"> x </i><span id="lives"><%= initialLives %></span>
+				</div>
+				<!-- Play Again? -->
+				<button class="btn btn-primary btn-default">
+					Begin Game
+				</button>
+				<div id="instruction">
+					Match as many cards as you can!
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+	<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.js"></script>
+	<script type="text/javascript" src="../carduo.js"></script>
+</body>
+</html>
