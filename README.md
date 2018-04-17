@@ -3,6 +3,6 @@ Single page web game application where the player must accumulate points by matc
 
 **Updates:**
 
-- As of April 2018, I've redesigned the app using React components. More updates will be made as I continue learning React, Redux, Webpack, etc.
+- As of April 2018, I've redesigned the app using React components for greater extensibility and maintainability. More updates will be made as I continue learning React, Redux, Webpack, etc.
 
 Link to play: http://carduo.herokuapp.com/
