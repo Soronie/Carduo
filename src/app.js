@@ -4,16 +4,29 @@ class CarduoApp extends React.Component{
 		this.updateLives = this.updateLives.bind(this);
 		this.beginGame = this.beginGame.bind(this);
 		this.incrementScore = this.incrementScore.bind(this);
-		this.handleChange = this.handleChange.bind(this);
+		this.handleSelectedCard = this.handleSelectedCard.bind(this);
+		this.title = 'Carduo';
+		this.initialLives = 10;
+		this.types= [
+			"fire",
+			"gamepad",
+			"shield",
+			"chain-broken",
+			"leaf",
+			"music",
+			"smile-o",
+			"heart",
+		];
+		this.totalCards = this.types.length*2;
 		this.state = {
 			positions: [],
 			selected: [],
 			colors: [],
-			gameRunning: false,
-			gameLoading: false,
-			count: 0,
+			isGameRunning: false,
+			isGameLoading: false,
+			matchedCards: 0,
 			score: 0,
-			lives: 10
+			lives: this.initialLives
 		}
 	}
 
@@ -21,8 +34,8 @@ class CarduoApp extends React.Component{
 	generateRandomPositions(){
 		let arr = [];
 
-		while(arr.length < 16){
-			var randomNumber = Math.floor(Math.random()*16);
+		while(arr.length < this.totalCards){
+			var randomNumber = Math.floor(Math.random()*this.totalCards);
 			if(arr.indexOf(randomNumber) === -1)
 				arr[arr.length] = randomNumber;
 		}
@@ -31,9 +44,9 @@ class CarduoApp extends React.Component{
 	}
 
 	// Called whenever two cards are selected
-	updateLives(decrement){
-		// If the cards mismatch, decrement the player's lives
-		if(decrement){
+	updateLives(decrementLife){
+		// If the cards mismatch, decrementLiferement the player's lives
+		if(decrementLife){
 			this.setState((prevState) => {
 				return {
 					lives: prevState.lives-1
@@ -43,7 +56,8 @@ class CarduoApp extends React.Component{
 				() => {
 					if(this.state.lives === 0){
 						this.stopGame();
-						$('.fa:not(lives)').animate({opacity: 1}, 500);
+						// Reveal all the cards to the player
+						$('.fa:not(.lives)').animate({opacity: 1}, 500);
 					}
 				}
 			);
@@ -51,13 +65,15 @@ class CarduoApp extends React.Component{
 	}
 
 	incrementScore(){
+		// Increase score by one and matched cards by 2
 		this.setState((prevState) => {
 			return {
 				score: prevState.score+1,
-				count: prevState.count+2
+				matchedCards: prevState.matchedCards+2
 			}
 		}, () => {
-			if(this.state.count === 16){
+			// If all the cards are matched, restart a new round
+			if(this.state.matchedCards === this.totalCards){
 				this.stopGame();
 				setTimeout(() => {
 					this.beginGame();
@@ -67,39 +83,43 @@ class CarduoApp extends React.Component{
 	}
 
 	stopGame(){
+		// After a round is completed, either restart a new round or stop
 		this.setState(() => {
 			return {
-				gameRunning: this.state.lives > 0 ? true : false,
-				selected: Array(16).fill(false)
+				isGameRunning: this.state.lives > 0 ? true : false,
+				selected: Array(this.totalCards).fill(false)
 			}
 		});
 	}
 
 	// Game begins when the player presses the button
 	beginGame(){
-		if(this.state.gameLoading) return;
+		if(this.state.isGameLoading) return;
 		let pos = this.generateRandomPositions();
 		let col = this.generateRandomColors();
-		let sel = Array(16).fill(false);
+		let sel = Array(this.totalCards).fill(false);
+		let restart = !(this.state.matchedCards === this.totalCards);
+		$('.fa:not(.lives)').parent().removeClass('selected');
 		this.setState(() => {
 				return {
 					positions: pos,
 					colors: col,
 					selected: sel,
-					gameRunning: false,
-					gameLoading: true,
-					score: this.state.count === 16 ? this.state.score : 0,
-					lives: this.state.count === 16 ? this.state.lives : 10,
-					count: 0
+					isGameRunning: false,
+					isGameLoading: true,
+					score: restart ? 0 : this.state.score,
+					lives: restart ? this.initialLives : this.state.lives,
+					matchedCards: 0
 				};
 			}, () => {
+				// Briefly reveal the cards to the player, which fade over time
 				$('.fa:not(.lives)').parent().animate({opacity: 1}, 500);
 				$('.fa:not(.lives)').animate({opacity: 1}, 100);
 				$('.fa:not(.lives)').animate({opacity: 0}, 5000, () => {
 				this.setState(() => {
 						return {
-							gameRunning: true,
-							gameLoading: false
+							isGameRunning: true,
+							isGameLoading: false
 						};
 					});
 				});
@@ -107,9 +127,10 @@ class CarduoApp extends React.Component{
 	}
 
 	generateRandomColors(){
+		// Generate random colors for the given card set
 		let arr = [];
-		for(let i = 0; i < 8; i++){
-			var count = 0;
+		for(let i = 0; i < this.totalCards/2; i++){
+			var matchedCards = 0;
 			var intensities = [];
 			while(intensities.length < 3){
 				intensities.push(Math.floor(Math.random()*256 - 64));
@@ -119,7 +140,8 @@ class CarduoApp extends React.Component{
 		return arr;
 	}
 
-	handleChange(selectedCards){
+	handleSelectedCard(selectedCards){
+		// Update selected state for the cards
 		this.setState(() => {
 			return {
 				selected: selectedCards
@@ -128,27 +150,30 @@ class CarduoApp extends React.Component{
 	}
 
 	render(){
-		this.title = 'Carduo';
 		return(
 			<div>
 				<h1>{this.title}</h1>
 				<div className="container">
 					<div className="row">
 						<Cards
-							isGameRunning={this.state.gameRunning}
-							updateLives={this.updateLives}
-							lives={this.state.lives}
 							positions={this.state.positions}
-							incrementScore={this.incrementScore}
 							colors={this.state.colors}
-							handleChange={this.handleChange}
-							selected={this.state.selected}/>
+							selected={this.state.selected}
+							types={this.types}
+							lives={this.state.lives}
+							totalCards={this.totalCards}
+							isGameRunning={this.state.isGameRunning}
+							updateLives={this.updateLives}
+							incrementScore={this.incrementScore}
+							handleSelectedCard={this.handleSelectedCard}
+						/>
 
 						<Guide
 							beginGame={this.beginGame}
 							lives={this.state.lives}
-							isGameRunning={this.state.gameRunning}
-							score={this.state.score}/>
+							isGameRunning={this.state.isGameRunning}
+							score={this.state.score}
+						/>
 					</div>
 				</div>
 			</div>
@@ -159,17 +184,7 @@ class CarduoApp extends React.Component{
 class Cards extends React.Component{
 	constructor(props){
 		super(props);
-		this.handleSelected = this.handleSelected.bind(this);
-		this.types = [
-			"fire",
-			"gamepad",
-			"shield",
-			"chain-broken",
-			"leaf",
-			"music",
-			"smile-o",
-			"heart"
-		];
+		this.handleSelectedCard = this.handleSelectedCard.bind(this);
 
 		// first: the first card picked to see if second selection matches
 		this.state = {
@@ -177,65 +192,79 @@ class Cards extends React.Component{
 		}
 	}
 
-	handleSelected(card){
+	handleSelectedCard(card){
 		// If the card is selected when the game isn't running, return
-		if(!this.props.isGameRunning || this.props.selected[card.id]) return;
+		if(!this.props.isGameRunning) return;
+
+		$(`#${card.id}`).parent().addClass('selected');
+		let selected = this.props.selected;
+
 
 		$(`#${card.id}`).animate({opacity: 1}, 100);
 		// If the card is the first one picked or the game has restarted, store its value
 		if(!this.state.first || this.props.selected.indexOf(true) === -1){
 			this.setState(() => {
-				let selected = this.props.selected.slice();
-				selected[card.id] = true;
-				this.props.handleChange(selected);
 				return {
 					first: card
 				};
 			});
+			selected[card.id] = true;
 		}else{	// The second card was picked, so see if it matches first
 			this.setState(() => {
-				let dec = false;
-				let selected = this.props.selected;
-
-				// If the cards match, mark the second card as selected
-				if(this.state.first.className === card.className){
-					$(`#${this.state.first.id}`).parent().fadeTo(750, 0);
-					$(`#${card.id}`).parent().fadeTo(750, 0);
-					selected[card.id] = true;
-					this.props.incrementScore();
-				}else{ // The cards mismatch, so de-select the first card for the next attempt
-					selected[this.state.first.id] = false;
-					dec = true;
-
-					// Don't fade out the last two selected cards when the player is on their last life
-					if(this.props.lives > 1){
-						$(`#${this.state.first.id}`).animate({opacity: 0}, 750);
-						$(`#${card.id}`).animate({opacity: 0}, 750);
-					}
-				}
-
-				// dec is true when there is a mismatch; false otherwise
-				this.props.updateLives(dec);
-				this.props.handleChange(selected);
-
 				// Refresh first after a mis/match
 				return {
 					first: undefined
 				};
-			});
+			});	
+
+			let decrementLife = false;
+
+			// The cards match
+			if(this.state.first.className === card.className){
+				// Make first and second cards fade
+				$(`#${this.state.first.id}`).parent().fadeTo(750, 0);
+				$(`#${card.id}`).parent().fadeTo(750, 0);
+
+				// Mark second card as selected, then increment score
+				selected[card.id] = true;
+				this.props.incrementScore();
+			}else{ // The cards mismatch
+				//De-select the first card for the next attempt
+				//Decrement life
+				selected[this.state.first.id] = false;
+				decrementLife = true;
+
+				// Remove selected state from card elements
+				$(`#${this.state.first.id}`).parent().removeClass('selected');
+				$(`#${card.id}`).parent().removeClass('selected');
+
+				// Don't fade out the last two selected cards when the player is on their last life
+				if(this.props.lives > 1){
+					$(`#${this.state.first.id}`).animate({opacity: 0}, 750);
+					$(`#${card.id}`).animate({opacity: 0}, 750);
+				}
+			}
+
+			// decrementLife is true when there is a mismatch; false otherwise
+			this.props.updateLives(decrementLife);
+			// update selected states for cards
+			this.props.handleSelectedCard(selected);
 		}
 	}
 
 	render(){
-		// Produce 16 cards on the app
+		// Produce all cards on the app given random colors, positions, and selected states
 		let cards = [];
-		for(let i = 0; i < 16; i++){
-			cards.push(<Card type={this.types[this.props.positions[i] % 8]} index={i}
-				handleSelected={this.handleSelected}
-				selected={this.props.selected[i]}
-				color={this.props.colors[this.props.positions[i] % 8]}
-				key={i}
-			/>);
+		for(let i = 0; i < this.props.totalCards; i++){
+			cards.push(
+				<Card
+					type={this.props.types[this.props.positions[i] % (this.props.types.length)]}
+					index={i}
+					handleSelectedCard={this.handleSelectedCard}
+					selected={this.props.selected[i]}
+					color={this.props.colors[this.props.positions[i] % (this.props.types.length)]}
+					key={i}
+				/>);
 		}
 
 		return(
@@ -251,20 +280,21 @@ class Cards extends React.Component{
 class Card extends React.Component{
 	constructor(props){
 		super(props);
-		this.handleSelected = this.handleSelected.bind(this);
+		this.handleSelectedCard = this.handleSelectedCard.bind(this);
 	}
 
-	handleSelected(e){
+	handleSelectedCard(e){
 		// If the item has not been selected before, possibly mark it as selected
 		if(!this.props.selected){
-			this.props.handleSelected(e.target);
+			this.props.handleSelectedCard(e.target);
 		}
 	}
 
 	render(){
 		return(
-			<div onClick={this.handleSelected} className="col-xs-3 card">
+			<div className="col-xs-3 card">
 				<i id={this.props.index}
+					onClick={this.handleSelectedCard}
 					className={"fa fa-" + this.props.type}
 					aria-hidden="true"
 					style={{backgroundColor: this.props.color}}>

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -19,16 +19,20 @@ var CarduoApp = function (_React$Component) {
 		_this.updateLives = _this.updateLives.bind(_this);
 		_this.beginGame = _this.beginGame.bind(_this);
 		_this.incrementScore = _this.incrementScore.bind(_this);
-		_this.handleChange = _this.handleChange.bind(_this);
+		_this.handleSelectedCard = _this.handleSelectedCard.bind(_this);
+		_this.title = 'Carduo';
+		_this.initialLives = 10;
+		_this.types = ["fire", "gamepad", "shield", "chain-broken", "leaf", "music", "smile-o", "heart"];
+		_this.totalCards = _this.types.length * 2;
 		_this.state = {
 			positions: [],
 			selected: [],
 			colors: [],
-			gameRunning: false,
-			gameLoading: false,
-			count: 0,
+			isGameRunning: false,
+			isGameLoading: false,
+			matchedCards: 0,
 			score: 0,
-			lives: 10
+			lives: _this.initialLives
 		};
 		return _this;
 	}
@@ -37,12 +41,12 @@ var CarduoApp = function (_React$Component) {
 
 
 	_createClass(CarduoApp, [{
-		key: 'generateRandomPositions',
+		key: "generateRandomPositions",
 		value: function generateRandomPositions() {
 			var arr = [];
 
-			while (arr.length < 16) {
-				var randomNumber = Math.floor(Math.random() * 16);
+			while (arr.length < this.totalCards) {
+				var randomNumber = Math.floor(Math.random() * this.totalCards);
 				if (arr.indexOf(randomNumber) === -1) arr[arr.length] = randomNumber;
 			}
 
@@ -52,12 +56,12 @@ var CarduoApp = function (_React$Component) {
 		// Called whenever two cards are selected
 
 	}, {
-		key: 'updateLives',
-		value: function updateLives(decrement) {
+		key: "updateLives",
+		value: function updateLives(decrementLife) {
 			var _this2 = this;
 
-			// If the cards mismatch, decrement the player's lives
-			if (decrement) {
+			// If the cards mismatch, decrementLiferement the player's lives
+			if (decrementLife) {
 				this.setState(function (prevState) {
 					return {
 						lives: prevState.lives - 1
@@ -67,23 +71,26 @@ var CarduoApp = function (_React$Component) {
 				function () {
 					if (_this2.state.lives === 0) {
 						_this2.stopGame();
-						$('.fa:not(lives)').animate({ opacity: 1 }, 500);
+						// Reveal all the cards to the player
+						$('.fa:not(.lives)').animate({ opacity: 1 }, 500);
 					}
 				});
 			}
 		}
 	}, {
-		key: 'incrementScore',
+		key: "incrementScore",
 		value: function incrementScore() {
 			var _this3 = this;
 
+			// Increase score by one and matched cards by 2
 			this.setState(function (prevState) {
 				return {
 					score: prevState.score + 1,
-					count: prevState.count + 2
+					matchedCards: prevState.matchedCards + 2
 				};
 			}, function () {
-				if (_this3.state.count === 16) {
+				// If all the cards are matched, restart a new round
+				if (_this3.state.matchedCards === _this3.totalCards) {
 					_this3.stopGame();
 					setTimeout(function () {
 						_this3.beginGame();
@@ -92,14 +99,15 @@ var CarduoApp = function (_React$Component) {
 			});
 		}
 	}, {
-		key: 'stopGame',
+		key: "stopGame",
 		value: function stopGame() {
 			var _this4 = this;
 
+			// After a round is completed, either restart a new round or stop
 			this.setState(function () {
 				return {
-					gameRunning: _this4.state.lives > 0 ? true : false,
-					selected: Array(16).fill(false)
+					isGameRunning: _this4.state.lives > 0 ? true : false,
+					selected: Array(_this4.totalCards).fill(false)
 				};
 			});
 		}
@@ -107,55 +115,60 @@ var CarduoApp = function (_React$Component) {
 		// Game begins when the player presses the button
 
 	}, {
-		key: 'beginGame',
+		key: "beginGame",
 		value: function beginGame() {
 			var _this5 = this;
 
-			if (this.state.gameLoading) return;
+			if (this.state.isGameLoading) return;
 			var pos = this.generateRandomPositions();
 			var col = this.generateRandomColors();
-			var sel = Array(16).fill(false);
+			var sel = Array(this.totalCards).fill(false);
+			var restart = !(this.state.matchedCards === this.totalCards);
+			$('.fa:not(.lives)').parent().removeClass('selected');
 			this.setState(function () {
 				return {
 					positions: pos,
 					colors: col,
 					selected: sel,
-					gameRunning: false,
-					gameLoading: true,
-					score: _this5.state.count === 16 ? _this5.state.score : 0,
-					lives: _this5.state.count === 16 ? _this5.state.lives : 10,
-					count: 0
+					isGameRunning: false,
+					isGameLoading: true,
+					score: restart ? 0 : _this5.state.score,
+					lives: restart ? _this5.initialLives : _this5.state.lives,
+					matchedCards: 0
 				};
 			}, function () {
+				// Briefly reveal the cards to the player, which fade over time
 				$('.fa:not(.lives)').parent().animate({ opacity: 1 }, 500);
 				$('.fa:not(.lives)').animate({ opacity: 1 }, 100);
 				$('.fa:not(.lives)').animate({ opacity: 0 }, 5000, function () {
 					_this5.setState(function () {
 						return {
-							gameRunning: true,
-							gameLoading: false
+							isGameRunning: true,
+							isGameLoading: false
 						};
 					});
 				});
 			});
 		}
 	}, {
-		key: 'generateRandomColors',
+		key: "generateRandomColors",
 		value: function generateRandomColors() {
+			// Generate random colors for the given card set
 			var arr = [];
-			for (var i = 0; i < 8; i++) {
-				var count = 0;
+			for (var i = 0; i < this.totalCards / 2; i++) {
+				var matchedCards = 0;
 				var intensities = [];
 				while (intensities.length < 3) {
 					intensities.push(Math.floor(Math.random() * 256 - 64));
 				}
-				arr.push('rgb(' + intensities[0] + ', ' + intensities[1] + ', ' + intensities[2]);
+				arr.push("rgb(" + intensities[0] + ", " + intensities[1] + ", " + intensities[2]);
 			}
 			return arr;
 		}
 	}, {
-		key: 'handleChange',
-		value: function handleChange(selectedCards) {
+		key: "handleSelectedCard",
+		value: function handleSelectedCard(selectedCards) {
+			// Update selected state for the cards
 			this.setState(function () {
 				return {
 					selected: selectedCards
@@ -163,37 +176,40 @@ var CarduoApp = function (_React$Component) {
 			});
 		}
 	}, {
-		key: 'render',
+		key: "render",
 		value: function render() {
-			this.title = 'Carduo';
 			return React.createElement(
-				'div',
+				"div",
 				null,
 				React.createElement(
-					'h1',
+					"h1",
 					null,
 					this.title
 				),
 				React.createElement(
-					'div',
-					{ className: 'container' },
+					"div",
+					{ className: "container" },
 					React.createElement(
-						'div',
-						{ className: 'row' },
+						"div",
+						{ className: "row" },
 						React.createElement(Cards, {
-							isGameRunning: this.state.gameRunning,
-							updateLives: this.updateLives,
-							lives: this.state.lives,
 							positions: this.state.positions,
-							incrementScore: this.incrementScore,
 							colors: this.state.colors,
-							handleChange: this.handleChange,
-							selected: this.state.selected }),
+							selected: this.state.selected,
+							types: this.types,
+							lives: this.state.lives,
+							totalCards: this.totalCards,
+							isGameRunning: this.state.isGameRunning,
+							updateLives: this.updateLives,
+							incrementScore: this.incrementScore,
+							handleSelectedCard: this.handleSelectedCard
+						}),
 						React.createElement(Guide, {
 							beginGame: this.beginGame,
 							lives: this.state.lives,
-							isGameRunning: this.state.gameRunning,
-							score: this.state.score })
+							isGameRunning: this.state.isGameRunning,
+							score: this.state.score
+						})
 					)
 				)
 			);
@@ -211,8 +227,7 @@ var Cards = function (_React$Component2) {
 
 		var _this6 = _possibleConstructorReturn(this, (Cards.__proto__ || Object.getPrototypeOf(Cards)).call(this, props));
 
-		_this6.handleSelected = _this6.handleSelected.bind(_this6);
-		_this6.types = ["fire", "gamepad", "shield", "chain-broken", "leaf", "music", "smile-o", "heart"];
+		_this6.handleSelectedCard = _this6.handleSelectedCard.bind(_this6);
 
 		// first: the first card picked to see if second selection matches
 		_this6.state = {
@@ -222,79 +237,89 @@ var Cards = function (_React$Component2) {
 	}
 
 	_createClass(Cards, [{
-		key: 'handleSelected',
-		value: function handleSelected(card) {
-			var _this7 = this;
-
+		key: "handleSelectedCard",
+		value: function handleSelectedCard(card) {
 			// If the card is selected when the game isn't running, return
-			if (!this.props.isGameRunning || this.props.selected[card.id]) return;
+			if (!this.props.isGameRunning) return;
 
-			$('#' + card.id).animate({ opacity: 1 }, 100);
+			$("#" + card.id).parent().addClass('selected');
+			var selected = this.props.selected;
+
+			$("#" + card.id).animate({ opacity: 1 }, 100);
 			// If the card is the first one picked or the game has restarted, store its value
 			if (!this.state.first || this.props.selected.indexOf(true) === -1) {
 				this.setState(function () {
-					var selected = _this7.props.selected.slice();
-					selected[card.id] = true;
-					_this7.props.handleChange(selected);
 					return {
 						first: card
 					};
 				});
+				selected[card.id] = true;
 			} else {
 				// The second card was picked, so see if it matches first
 				this.setState(function () {
-					var dec = false;
-					var selected = _this7.props.selected;
-
-					// If the cards match, mark the second card as selected
-					if (_this7.state.first.className === card.className) {
-						$('#' + _this7.state.first.id).parent().fadeTo(750, 0);
-						$('#' + card.id).parent().fadeTo(750, 0);
-						selected[card.id] = true;
-						_this7.props.incrementScore();
-					} else {
-						// The cards mismatch, so de-select the first card for the next attempt
-						selected[_this7.state.first.id] = false;
-						dec = true;
-
-						// Don't fade out the last two selected cards when the player is on their last life
-						if (_this7.props.lives > 1) {
-							$('#' + _this7.state.first.id).animate({ opacity: 0 }, 750);
-							$('#' + card.id).animate({ opacity: 0 }, 750);
-						}
-					}
-
-					// dec is true when there is a mismatch; false otherwise
-					_this7.props.updateLives(dec);
-					_this7.props.handleChange(selected);
-
 					// Refresh first after a mis/match
 					return {
 						first: undefined
 					};
 				});
+
+				var decrementLife = false;
+
+				// The cards match
+				if (this.state.first.className === card.className) {
+					// Make first and second cards fade
+					$("#" + this.state.first.id).parent().fadeTo(750, 0);
+					$("#" + card.id).parent().fadeTo(750, 0);
+
+					// Mark second card as selected, then increment score
+					selected[card.id] = true;
+					this.props.incrementScore();
+				} else {
+					// The cards mismatch
+					//De-select the first card for the next attempt
+					//Decrement life
+					selected[this.state.first.id] = false;
+					decrementLife = true;
+
+					// Remove selected state from card elements
+					$("#" + this.state.first.id).parent().removeClass('selected');
+					$("#" + card.id).parent().removeClass('selected');
+
+					// Don't fade out the last two selected cards when the player is on their last life
+					if (this.props.lives > 1) {
+						$("#" + this.state.first.id).animate({ opacity: 0 }, 750);
+						$("#" + card.id).animate({ opacity: 0 }, 750);
+					}
+				}
+
+				// decrementLife is true when there is a mismatch; false otherwise
+				this.props.updateLives(decrementLife);
+				// update selected states for cards
+				this.props.handleSelectedCard(selected);
 			}
 		}
 	}, {
-		key: 'render',
+		key: "render",
 		value: function render() {
-			// Produce 16 cards on the app
+			// Produce all cards on the app given random colors, positions, and selected states
 			var cards = [];
-			for (var i = 0; i < 16; i++) {
-				cards.push(React.createElement(Card, { type: this.types[this.props.positions[i] % 8], index: i,
-					handleSelected: this.handleSelected,
+			for (var i = 0; i < this.props.totalCards; i++) {
+				cards.push(React.createElement(Card, {
+					type: this.props.types[this.props.positions[i] % this.props.types.length],
+					index: i,
+					handleSelectedCard: this.handleSelectedCard,
 					selected: this.props.selected[i],
-					color: this.props.colors[this.props.positions[i] % 8],
+					color: this.props.colors[this.props.positions[i] % this.props.types.length],
 					key: i
 				}));
 			}
 
 			return React.createElement(
-				'div',
-				{ id: 'left', className: 'col-xs-6 half' },
+				"div",
+				{ id: "left", className: "col-xs-6 half" },
 				React.createElement(
-					'div',
-					{ className: 'row' },
+					"div",
+					{ className: "row" },
 					cards
 				)
 			);
@@ -310,29 +335,30 @@ var Card = function (_React$Component3) {
 	function Card(props) {
 		_classCallCheck(this, Card);
 
-		var _this8 = _possibleConstructorReturn(this, (Card.__proto__ || Object.getPrototypeOf(Card)).call(this, props));
+		var _this7 = _possibleConstructorReturn(this, (Card.__proto__ || Object.getPrototypeOf(Card)).call(this, props));
 
-		_this8.handleSelected = _this8.handleSelected.bind(_this8);
-		return _this8;
+		_this7.handleSelectedCard = _this7.handleSelectedCard.bind(_this7);
+		return _this7;
 	}
 
 	_createClass(Card, [{
-		key: 'handleSelected',
-		value: function handleSelected(e) {
+		key: "handleSelectedCard",
+		value: function handleSelectedCard(e) {
 			// If the item has not been selected before, possibly mark it as selected
 			if (!this.props.selected) {
-				this.props.handleSelected(e.target);
+				this.props.handleSelectedCard(e.target);
 			}
 		}
 	}, {
-		key: 'render',
+		key: "render",
 		value: function render() {
 			return React.createElement(
-				'div',
-				{ onClick: this.handleSelected, className: 'col-xs-3 card' },
-				React.createElement('i', { id: this.props.index,
+				"div",
+				{ className: "col-xs-3 card" },
+				React.createElement("i", { id: this.props.index,
+					onClick: this.handleSelectedCard,
 					className: "fa fa-" + this.props.type,
-					'aria-hidden': 'true',
+					"aria-hidden": "true",
 					style: { backgroundColor: this.props.color } })
 			);
 		}
@@ -351,48 +377,48 @@ var Guide = function (_React$Component4) {
 	}
 
 	_createClass(Guide, [{
-		key: 'render',
+		key: "render",
 		value: function render() {
 			return React.createElement(
-				'div',
-				{ id: 'right', className: 'col-xs-6 half' },
+				"div",
+				{ id: "right", className: "col-xs-6 half" },
 				React.createElement(
-					'div',
+					"div",
 					null,
 					React.createElement(
-						'h2',
+						"h2",
 						null,
-						'Score'
+						"Score"
 					),
 					React.createElement(
-						'h2',
-						{ id: 'score' },
+						"h2",
+						{ id: "score" },
 						this.props.score
 					)
 				),
 				React.createElement(
-					'div',
+					"div",
 					null,
 					React.createElement(
-						'i',
-						{ className: 'fa fa-heart-o lives', 'aria-hidden': 'true' },
-						' x '
+						"i",
+						{ className: "fa fa-heart-o lives", "aria-hidden": "true" },
+						" x "
 					),
 					React.createElement(
-						'span',
-						{ id: 'lives' },
+						"span",
+						{ id: "lives" },
 						this.props.lives
 					)
 				),
 				React.createElement(
-					'button',
-					{ onClick: this.props.beginGame, className: 'btn btn-primary btn-default' },
+					"button",
+					{ onClick: this.props.beginGame, className: "btn btn-primary btn-default" },
 					!this.props.isGameRunning ? this.props.lives > 0 ? 'Begin Game' : 'Play Again' : 'Restart Game'
 				),
 				React.createElement(
-					'div',
-					{ id: 'instruction' },
-					'Match as many cards as you can!'
+					"div",
+					{ id: "instruction" },
+					"Match as many cards as you can!"
 				)
 			);
 		}

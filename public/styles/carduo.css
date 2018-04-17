@@ -67,3 +67,7 @@ h2 {
 #instruction {
 	font-size: 35px;
 }
+
+.selected {
+	border-color: yellow;
+}
