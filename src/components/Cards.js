@@ -30,12 +30,11 @@ export default class Cards extends React.Component{
 			});
 			selected[card.id] = true;
 		}else{	// The second card was picked, so see if it matches first
-			this.setState(() => {
+			this.setState(() => ({
 				// Refresh first after a mis/match
-				return {
 					first: undefined
-				};
-			});	
+				})
+			);	
 
 			let decrementLife = false;
 

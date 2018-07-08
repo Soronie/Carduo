@@ -51,11 +51,9 @@ export default class CarduoApp extends React.Component{
 	updateLives(decrementLife){
 		// If the cards mismatch, decrementLiferement the player's lives
 		if(decrementLife){
-			this.setState((prevState) => {
-				return {
+			this.setState((prevState) => ({
 					lives: prevState.lives-1
-				};
-			},
+			}),
 				// If the player has 0 lives remaining, stop the game
 				() => {
 					if(this.state.lives === 0){
@@ -70,12 +68,10 @@ export default class CarduoApp extends React.Component{
 
 	incrementScore(){
 		// Increase score by one and matched cards by 2
-		this.setState((prevState) => {
-			return {
+		this.setState((prevState) => ({
 				score: prevState.score+1,
 				matchedCards: prevState.matchedCards+2
-			}
-		}, () => {
+		}), () => {
 			// If all the cards are matched, restart a new round
 			if(this.state.matchedCards === this.totalCards){
 				this.stopGame();
@@ -88,12 +84,10 @@ export default class CarduoApp extends React.Component{
 
 	stopGame(){
 		// After a round is completed, either restart a new round or stop
-		this.setState(() => {
-			return {
+		this.setState(() => ({
 				isGameRunning: this.state.lives > 0 ? true : false,
 				selected: Array(this.totalCards).fill(false)
-			}
-		});
+		}));
 	}
 
 	// Game begins when the player presses the button
@@ -104,8 +98,7 @@ export default class CarduoApp extends React.Component{
 		let sel = Array(this.totalCards).fill(false);
 		let restart = !(this.state.matchedCards === this.totalCards);
 		$('.fa:not(.lives)').parent().removeClass('selected');
-		this.setState(() => {
-				return {
+		this.setState(() => ({
 					positions: pos,
 					colors: col,
 					selected: sel,
@@ -114,18 +107,16 @@ export default class CarduoApp extends React.Component{
 					score: restart ? 0 : this.state.score,
 					lives: restart ? this.initialLives : this.state.lives,
 					matchedCards: 0
-				};
-			}, () => {
+			}), () => {
 				// Briefly reveal the cards to the player, which fade over time
 				$('.fa:not(.lives)').parent().animate({opacity: 1}, 500);
 				$('.fa:not(.lives)').animate({opacity: 1}, 100);
 				$('.fa:not(.lives)').animate({opacity: 0}, 5000, () => {
-				this.setState(() => {
-						return {
+				this.setState(() => ({
 							isGameRunning: true,
 							isGameLoading: false
-						};
-					});
+						})
+					);
 				});
 		});
 	}
@@ -146,11 +137,10 @@ export default class CarduoApp extends React.Component{
 
 	handleSelectedCard(selectedCards){
 		// Update selected state for the cards
-		this.setState(() => {
-			return {
+		this.setState(() => ({
 				selected: selectedCards
-			}
-		});
+			})
+		);
 	}
 
 	render(){
